@@ -1,0 +1,5 @@
+﻿test,comparison,statistic,p_value,significant,interpretation
+Kruskal-Wallis H-test,Engagement across platforms,399.43,0.0,Yes,Platform engagement differences are statistically significant
+Chi-squared test,Sentiment distribution across platforms,95.02,0.0,Yes,Sentiment differs significantly across platforms
+Mann-Whitney U test,Visual vs text content engagement,585838.0,0.0,Yes,Visual content significantly outperforms text
+Spearman correlation,Text length vs engagement,-0.0856,0.00023,Yes,Negative correlation (r=-0.086)

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Growth Intelligence Pipeline — Architecture Diagram</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  body {
+    background: #0a0a0a;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 20px 40px;
+  }
+  h1 {
+    text-align: center;
+    color: #c8ff00;
+    font-size: 28px;
+    margin-bottom: 5px;
+  }
+  h2 {
+    text-align: center;
+    color: #888;
+    font-weight: 400;
+    font-size: 14px;
+    margin-top: 0;
+  }
+  .mermaid {
+    display: flex;
+    justify-content: center;
+    margin: 30px auto;
+    max-width: 1400px;
+  }
+  .mermaid svg {
+    max-width: 100%;
+    height: auto;
+  }
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    margin-top: 30px;
+    padding: 20px;
+    border-top: 1px solid #333;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+  }
+  .legend-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Growth Intelligence Pipeline — Full Architecture</h1>
+<h2>SPONGEBOBIKI TEAM &nbsp;|&nbsp; Claude Growth Reverse-Engineering System</h2>
+
+<div class="mermaid">
+graph TB
+    subgraph Sources["🌐 Data Sources (7 platforms)"]
+        S1["Reddit\nPublic JSON API\n🔓 No key needed"]
+        S2["YouTube\nHTML Scraping\n🔓 No key needed"]
+        S3["TikTok\nApify Actor"]
+        S4["Twitter / X\nApify Actor"]
+        S5["Instagram\nApify Actor"]
+        S6["LinkedIn\nApify Actor"]
+        S7["Threads\nApify Actor"]
+    end
+
+    subgraph Scrapers["⚙️ Scrapers Layer"]
+        R1["reddit.py\n• Exponential backoff\n• Retry-After compliance\n• 6 subreddits + 2 searches"]
+        R2["youtube.py\n• Regex metric extraction\n• 20+ fallback patterns\n• No API key"]
+        R3["tiktok.py\n• Multi-field fallback\n• URL reconstruction"]
+        R4["twitter.py\n• Nested response handling\n• Complex search queries"]
+        R5["instagram.py\n• 18 hashtag search\n• Language filtering"]
+        R6["linkedin.py\n• Deep nested extraction\n• 20+ field paths"]
+        R7["threads.py\n• Text deduplication\n• 15 keywords"]
+        SE["search_engine.py\n• DDG → Google → Bing\n• Auto-fallback chain\n• UA rotation"]
+    end
+
+    S1 --> R1
+    S2 --> R2
+    S3 --> R3
+    S4 --> R4
+    S5 --> R5
+    S6 --> R6
+    S7 --> R7
+
+    subgraph Wrapper["core/wrapper.py — Subprocess Orchestration"]
+        W1["600s timeout per scraper\nUTF-8 output capture\nExit code tracking"]
+    end
+
+    R1 & R2 & R3 & R4 & R5 & R6 & R7 --> W1
+
+    subgraph RawCSV["📁 data/raw/ — Per-Platform CSVs"]
+        CSV["reddit.csv  •  youtube.csv  •  tiktok.csv\ntwitter.csv  •  instagram.csv\nlinkedin.csv  •  threads.csv"]
+    end
+
+    W1 --> CSV
+
+    subgraph Pipeline["🔧 Processing Pipeline (sequential, fault-tolerant)"]
+        direction TB
+        M["1️⃣ merge.py\nClean text, normalize dates (5 formats)\nFilter English (langdetect, min 20 chars)\nDeduplicate by 200-char text hash\nAppend mode with existing dataset"]
+        DQ["2️⃣ data_quality.py\nFix negative engagement → 0\nClear future dates\nPlatform balance check (>70% = warning)\nGenerate data_quality.json"]
+        SENT["3️⃣ sentiment.py\nVADER lexicon scoring\nClassify: positive ≥0.05 / negative ≤−0.05\nAggregate by platform + weekly"]
+        AN["4️⃣ analyze.py\n• Dataset + platform + content type summaries\n• Top 20 posts + Z-score normalization\n• Keyword analysis (30 tracked terms)\n• Narrative buckets (6 regex patterns)\n• Narrative × Platform crosstab\n• 10 matplotlib charts"]
+        TS["5️⃣ timeseries.py\nWeekly aggregation\nLinear trend estimation\nMin 3 weeks required"]
+        TOP["6️⃣ topics.py\nTF-IDF vectorization (200 features)\nEmerging term detection (≥1.5× growth)\nChronological split comparison"]
+        AL["7️⃣ alerts.py\n🔴 Engagement spikes: 7-day rolling + 3σ\n🟡 Mention spikes: 2.5σ threshold\n🟢 Viral posts: >50× platform median\n📈 Keyword trends: ≥2× frequency increase"]
+        REP["8️⃣ report.py\nAuto-generate 12-section Markdown\nConsolidate 15+ analysis CSVs\nKey insights + methodology"]
+    end
+
+    CSV --> M
+    M --> DQ
+    DQ --> SENT
+    SENT --> AN
+    AN --> TS
+    TS --> TOP
+    TOP --> AL
+    AL --> REP
+
+    subgraph Outputs["📊 Outputs"]
+        DS["📄 final_dataset_eng.csv\n1,846 rows × 11 columns"]
+        RPT["📝 auto_report.md\n+ 15 analysis CSVs\n(platform, sentiment,\nkeywords, narratives...)"]
+        CHR["🎨 10 PNG Charts\n(engagement, keywords,\nheatmap, trends,\nnormalized scores)"]
+        ALR["🚨 alerts.json\nalerts_summary.txt\n15 HIGH + 14 MEDIUM +\n5 INFO alerts"]
+        LOG["📋 pipeline.log\nDual output:\nconsole + file"]
+    end
+
+    M --> DS
+    AN --> RPT
+    AN --> CHR
+    AL --> ALR
+    REP --> RPT
+
+    subgraph Orchestration["🔄 Orchestration & Deployment"]
+        RUN["run.py\n--skip-scrape  --append\nPer-step error handling\nContinues if step fails"]
+        SCH["scheduler.py\nAPScheduler\nConfigurable interval (default 60 min)\nRun history log"]
+        BAK["Backup Manager\nAuto-backup before each run\nKeep last 5 versions"]
+        DOC["Dockerfile\npython:3.11-slim\nHealthcheck endpoint\nPort 8501"]
+    end
+
+    RUN --> Pipeline
+    SCH --> RUN
+    BAK -.-> DS
+
+    subgraph Dashboard["🖥️ Streamlit Dashboard"]
+        DASH["app/dashboard.py\n• Plotly interactive charts\n• Platform metrics cards\n• Alert summary panel\n• Top posts carousel\n• Sentiment breakdown\n• Narrative heatmap\n• Pipeline trigger button\n• Dark theme (#0a0a0a + #c8ff00)"]
+    end
+
+    DS --> DASH
+    RPT --> DASH
+    CHR --> DASH
+    ALR --> DASH
+
+    subgraph Automation["🤖 Automated vs 👤 Human-Reviewed"]
+        direction LR
+        AUTO["✅ FULLY AUTOMATED\n─────────────────\nScraping all 7 platforms\nData merging + dedup\nSentiment scoring\nKeyword + narrative analysis\nAnomaly detection\nAlert generation\nReport generation\nChart creation\nDashboard refresh"]
+        HUMAN["👁️ HUMAN-REVIEWED\n─────────────────\nAlert triage + prioritization\nNarrative interpretation\nStrategic decisions\nCounter-playbook creation\nContent quality review\nExperiment design"]
+    end
+
+    style Sources fill:#1a1a2e,stroke:#e94560,color:#fff
+    style Scrapers fill:#16213e,stroke:#0f3460,color:#fff
+    style Wrapper fill:#0f3460,stroke:#533483,color:#fff
+    style RawCSV fill:#0f3460,stroke:#533483,color:#fff
+    style Pipeline fill:#1a0a30,stroke:#9b59b6,color:#fff
+    style Outputs fill:#1a2e1a,stroke:#c8ff00,color:#fff
+    style Orchestration fill:#2e1a1a,stroke:#e94560,color:#fff
+    style Dashboard fill:#2e0a0a,stroke:#e94560,color:#fff
+    style Automation fill:#0a0a0a,stroke:#555,color:#ccc
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#e94560"></div>Data Sources & UI</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#0f3460"></div>Scrapers & Raw Data</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#9b59b6"></div>Processing Pipeline</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#c8ff00"></div>Outputs</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#555"></div>Automation Boundary</div>
+</div>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    themeVariables: {
+      darkMode: true,
+      background: '#0a0a0a',
+      primaryColor: '#533483',
+      primaryTextColor: '#e0e0e0',
+      primaryBorderColor: '#e94560',
+      lineColor: '#888',
+      secondaryColor: '#16213e',
+      tertiaryColor: '#1a1a2e',
+      fontSize: '13px'
+    },
+    flowchart: {
+      curve: 'basis',
+      padding: 20,
+      nodeSpacing: 30,
+      rankSpacing: 50,
+      useMaxWidth: true
+    }
+  });
+</script>
+</body>
+</html>

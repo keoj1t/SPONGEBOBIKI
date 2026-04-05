@@ -1,0 +1,50 @@
+{
+  "rows_before": 1846,
+  "negative_engagement_fixed": 0,
+  "future_dates_cleared": 0,
+  "urls_present": 1846,
+  "urls_missing": 0,
+  "url_coverage_pct": 100.0,
+  "platform_distribution": [
+    {
+      "platform": "tiktok",
+      "count": 296,
+      "pct": 16.0
+    },
+    {
+      "platform": "reddit",
+      "count": 295,
+      "pct": 16.0
+    },
+    {
+      "platform": "twitter",
+      "count": 294,
+      "pct": 15.9
+    },
+    {
+      "platform": "linkedin",
+      "count": 268,
+      "pct": 14.5
+    },
+    {
+      "platform": "instagram",
+      "count": 254,
+      "pct": 13.8
+    },
+    {
+      "platform": "threads",
+      "count": 223,
+      "pct": 12.1
+    },
+    {
+      "platform": "youtube",
+      "count": 216,
+      "pct": 11.7
+    }
+  ],
+  "rows_with_date": 1846,
+  "date_coverage_pct": 100.0,
+  "rows_after": 1846,
+  "issues": [],
+  "timestamp": "2026-04-05T10:18:10.164397"
+}

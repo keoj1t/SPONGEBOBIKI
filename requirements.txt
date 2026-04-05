@@ -1,0 +1,15 @@
+pandas
+matplotlib
+streamlit
+requests
+beautifulsoup4
+lxml
+langdetect
+vaderSentiment
+plotly
+scikit-learn
+scipy
+apscheduler
+python-dotenv
+apify-client
+pytest
